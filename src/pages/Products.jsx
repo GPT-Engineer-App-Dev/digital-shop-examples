@@ -1,5 +1,6 @@
 import { Box, SimpleGrid, Image, Text, Button, VStack } from "@chakra-ui/react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
+import { useState, useEffect } from "react";
 
 const products = [
   { id: 1, name: "Smartphone", price: "$699", image: "/images/smartphone.jpg" },
@@ -7,10 +8,23 @@ const products = [
   { id: 3, name: "Headphones", price: "$199", image: "/images/headphones.jpg" },
 ];
 
-const Products = () => (
-  <Box p={4}>
-    <SimpleGrid columns={[1, 2, 3]} spacing={10}>
-      {products.map(product => (
+const Products = () => {
+  const [filteredProducts, setFilteredProducts] = useState(products);
+  const location = useLocation();
+
+  useEffect(() => {
+    const query = new URLSearchParams(location.search).get("search") || "";
+    setFilteredProducts(
+      products.filter((product) =>
+        product.name.toLowerCase().includes(query.toLowerCase())
+      )
+    );
+  }, [location.search]);
+
+  return (
+    <Box p={4}>
+      <SimpleGrid columns={[1, 2, 3]} spacing={10}>
+        {filteredProducts.map(product => (
         <Box key={product.id} borderWidth="1px" borderRadius="lg" overflow="hidden">
           <Image src={product.image} alt={product.name} />
           <VStack p={4}>
@@ -20,8 +34,9 @@ const Products = () => (
           </VStack>
         </Box>
       ))}
-    </SimpleGrid>
-  </Box>
-);
+      </SimpleGrid>
+    </Box>
+  );
+};
 
 export default Products;
